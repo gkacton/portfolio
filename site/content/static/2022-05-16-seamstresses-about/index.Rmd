@@ -1,5 +1,5 @@
 ---
-title: About the Seamstresses Project
+title: 
 author: Grace Acton
 date: '2022-05-16'
 slug: seamstresses-about
@@ -9,3 +9,82 @@ tags: []
 publishdate: '2022-05-16T10:47:08-04:00'
 comments: yes
 ---
+# _Promptitude and Fidelity_
+## Professional Seamstresses in Early 19th-Century New England
+
+Drawing on a collection of over 100 historical advertisements compiled during my time as an intern at Old Sturbridge Village, this project explores demographic trends among women professionals in the needle trades in New England between 1790 and 1850. Through statistical analysis and data visualization in R, I present a picture of women’s roles in the fashion industry in this particular place and time, and discuss the impact of these findings on how we view women professionals and clothing in the past. 
+
+### Leaflet Maps
+
+#### Ads from the Worcester City Directory, 1822-44
+
+```{r prep, echo = FALSE, include= FALSE}
+library(leaflet) 
+source("data_cleaning.R")
+```
+
+```{r worcester-map, echo = FALSE, warning=FALSE, fig.align = "center"}
+worcester_map <- leaflet(data = worcester_geo) %>% 
+  addTiles(group = "OSM") %>%
+  addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>% 
+  addCircleMarkers(
+    radius = 6,
+    fillColor = ~case_when(job_title == "Dressmaker" ~ "lightskyblue",
+                      job_title == "Milliner" ~ "purple",
+                      job_title == "Tailoress" ~ "yellow",
+                      job_title == "Store Owner" ~ "lightgreen",
+                      job_title == "Store owner" ~ "lightgreen",
+                      job_title == "Milliner; Dressmaker" ~ "blueviolet",
+                      job_title == "Milliner; dressmaker" ~ "blueviolet",
+                      job_title == "Tailor" ~ "blue",
+                      job_title == "Milliner; mantuamaker" ~ "magenta",
+                      job_title == "Milliner; Mantua-Maker" ~ "magenta",
+                      job_title == "Mantuamaker; Milliner" ~ "magenta",
+                      job_title == "Tailoress; apprentices" ~ "orange"),
+    color = "black",
+    stroke = TRUE, 
+    weight = 2,
+    fillOpacity = 0.5,
+    popup = ~popup) %>% 
+  addLayersControl(
+    baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+worcester_map
+
+```
+
+
+#### Massachusetts Seamstresses with Genealogy Information
+
+```{r genealogy-map, echo=FALSE, warning=FALSE, fig.align = "center"}
+
+genealogy_map <- leaflet(data = genealogy_geo) %>% 
+  addTiles(group = "OSM") %>%
+  addProviderTiles(providers$Stamen.Toner, group = "Toner") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>% 
+  addCircleMarkers(
+    radius = 6,
+    fillColor = "#9cc1d1",
+    color = "black",
+    stroke = TRUE, 
+    weight = 2,
+    fillOpacity = 0.75,
+    popup = ~genealogy_popup) %>% 
+  addLayersControl(
+    baseGroups = c("OSM (default)", "Toner", "Toner Lite"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+genealogy_map
+```
+
+
+### View the Full Presentation
+
+```{r seamstresses-presentation, echo=FALSE, fig.align='center'}
+knitr::include_url('https://gkacton.github.io/seamstresses/Presentation.html#1')
+```
+

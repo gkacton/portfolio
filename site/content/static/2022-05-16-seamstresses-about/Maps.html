@@ -1,0 +1,417 @@
+---
+title: "Maps"
+author: "Grace Acton"
+date: "2022-05-16"
+output: html_document
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/jquery/jquery.min.js"></script>
+<link href="/rmarkdown-libs/leaflet/leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet/leaflet.js"></script>
+<link href="/rmarkdown-libs/leafletfix/leafletfix.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/proj4/proj4.min.js"></script>
+<script src="/rmarkdown-libs/Proj4Leaflet/proj4leaflet.js"></script>
+<link href="/rmarkdown-libs/rstudio_leaflet/rstudio_leaflet.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/leaflet-binding/leaflet.js"></script>
+<script src="/rmarkdown-libs/leaflet-providers/leaflet-providers_1.9.0.js"></script>
+<script src="/rmarkdown-libs/leaflet-providers-plugin/leaflet-providers-plugin.js"></script>
+
+
+<div id="libraries" class="section level2">
+<h2>Libraries</h2>
+<pre class="r"><code>library(tidyverse) ## For plotting and data wrangling.</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
+## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+## ✓ readr   2.1.2     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(leaflet) ## For leaflet interactive maps
+
+library(sf) ## For spatial data</code></pre>
+<pre><code>## Linking to GEOS 3.9.1, GDAL 3.4.0, PROJ 8.1.1; sf_use_s2() is TRUE</code></pre>
+<pre class="r"><code>library(RColorBrewer) ## For colour palettes
+
+library(htmltools) ## For html
+
+library(leafsync) ## For placing plots side by side
+
+library(kableExtra) ## Table output</code></pre>
+<pre><code>## 
+## Attaching package: &#39;kableExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     group_rows</code></pre>
+<pre class="r"><code>library(ggmap) ## for google geocoding</code></pre>
+<pre><code>## Google&#39;s Terms of Service: https://cloud.google.com/maps-platform/terms/.</code></pre>
+<pre><code>## Please cite ggmap if you use it! See citation(&quot;ggmap&quot;) for details.</code></pre>
+<pre class="r"><code>source(&quot;data_cleaning.R&quot;)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre><code>## 
+## Attaching package: &#39;rlang&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:purrr&#39;:
+## 
+##     %@%, as_function, flatten, flatten_chr, flatten_dbl, flatten_int,
+##     flatten_lgl, flatten_raw, invoke, splice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:rlang&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggmap&#39;:
+## 
+##     inset</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## Rows: 100 Columns: 14
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (13): name, job_title, address, city, state, location_type, additional_d...
+## dbl  (1): year
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## Rows: 31 Columns: 20
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (20): name, birth_date, birth_city, birth_state, father, mother, address...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## Rows: 76 Columns: 7
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (6): name, street_address, city, state, job_title, source_name
+## dbl (1): year
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## Rows: 10 Columns: 2
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (2): ad_id, ad_link
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre><code>## Reading layer `TOWNSSURVEY_POLYM&#39; from data source 
+##   `/Users/gkacton/Desktop/portfolio/site/content/static/2022-05-16-seamstresses-about/data/townssurvey_shp/TOWNSSURVEY_POLYM.shp&#39; 
+##   using driver `ESRI Shapefile&#39;
+## Simple feature collection with 351 features and 16 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 33863.73 ymin: 777606.4 xmax: 330837 ymax: 959743
+## Projected CRS: NAD83 / Massachusetts Mainland</code></pre>
+<pre><code>## Source : https://maps.googleapis.com/maps/api/geocode/json?address=27+Main+Street,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=7+Granite+Block,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=47+Main+Street,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=47+Main+Street,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Beech+St,+Worcester,+MA&amp;key=xxx
+## &quot;Beech St, Worcest...&quot; not uniquely geocoded, using &quot;beech st, clinton, ma 01510, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Brown+St/Pond+St,+Worcester,+MA&amp;key=xxx
+## &quot;Brown St/Pond St,...&quot; not uniquely geocoded, using &quot;pond st, worcester, ma 01604, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=78+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=14+Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Corner+of+Mechanic+and+Short+Streets,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Hind&#39;s+Court,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Grafton+St.,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Washington+Square,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=57+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Arch+St,+Worcester,+MA&amp;key=xxx
+## &quot;Arch St, Worceste...&quot; not uniquely geocoded, using &quot;arch st, massachusetts, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Summer+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Myrtle+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=93+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Beech+St,+Worcester,+MA&amp;key=xxx
+## &quot;Beech St, Worcest...&quot; not uniquely geocoded, using &quot;beech st, clinton, ma 01510, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Spring+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Central+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Summer+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=85+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=147+Main,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Central+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=94+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pine+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=164+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Myrtle+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=127+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=78+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lincoln+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Union+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Corner+of+Short+St+and+Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Summer+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Temple+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Salem+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pond+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Old+Market+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pond+St+near+Winter,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Short+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Park+St,+Worcester,+MA&amp;key=xxx
+## &quot;Park St, Worceste...&quot; not uniquely geocoded, using &quot;park st, gardner, ma 01440, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Central+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=83+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Salem+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Corner+of+Short+St+and+Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pond+St+near+Green,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=71+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=57+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=107+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=93+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=164+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Central+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=85+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Front+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lincoln+Square,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=127+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=78+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Summer+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=School+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Market+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=47+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=21+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=83+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Front+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=71+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=57+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=107+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=93+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=164+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=85+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=127+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=78+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Summer+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=47+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Haverhill,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Acton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Concord,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Concord,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Haverhill,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Concord,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Concord,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=North+Brookfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Spencer,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Southbridge,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Williamsburg,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Easthampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Southbridge,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Amherst,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Southampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Chesterfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Tyringham,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Chesterfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Newburyport,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Amherst,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lanesborough,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Northampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Concord,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Newburyport,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Northampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lancaster,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Amherst,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Sturbridge,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Petersham,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Northampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Northampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Petersham,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Sturbridge,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lowell,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Groton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Groton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Greenfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Athol,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Barre,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Templeton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Chesterfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=38+Pomeroy+Ave,+Pittsfield,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Southbridge,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=85+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=147+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=14+Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Brown+St,+Worcester,+MA&amp;key=xxx
+## &quot;Brown St, Worcest...&quot; not uniquely geocoded, using &quot;brown st, leicester, ma 01611, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Mechanic+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Short+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Southampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Southampton,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=57+Main+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Beech+St,+Worcester,+MA&amp;key=xxx
+## &quot;Beech St, Worcest...&quot; not uniquely geocoded, using &quot;beech st, clinton, ma 01510, usa&quot;
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=26+Green+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=17+Ship+St,+Newburyport,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=11+Beck+St,+Newburyport,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Lee,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=Thomas+St,+Worcester,+MA&amp;key=xxx
+## Source : https://maps.googleapis.com/maps/api/geocode/json?address=78+Main+St,+Worcester,+MA&amp;key=xxx</code></pre>
+</div>
+<div id="base-map" class="section level2">
+<h2>Base Map</h2>
+</div>
+<div id="regionality-of-job-titles" class="section level2">
+<h2>Regionality of Job Titles</h2>
+<pre class="r"><code>worcester_map &lt;- leaflet(data = worcester_geo) %&gt;% 
+  addTiles(group = &quot;OSM&quot;) %&gt;%
+  addProviderTiles(providers$Stamen.Toner, group = &quot;Toner&quot;) %&gt;%
+  addProviderTiles(providers$Stamen.TonerLite, group = &quot;Toner Lite&quot;) %&gt;% 
+  addCircleMarkers(
+    radius = 6,
+    fillColor = ~case_when(job_title == &quot;Dressmaker&quot; ~ &quot;lightskyblue&quot;,
+                      job_title == &quot;Milliner&quot; ~ &quot;purple&quot;,
+                      job_title == &quot;Tailoress&quot; ~ &quot;yellow&quot;,
+                      job_title == &quot;Store Owner&quot; ~ &quot;lightgreen&quot;,
+                      job_title == &quot;Store owner&quot; ~ &quot;lightgreen&quot;,
+                      job_title == &quot;Milliner; Dressmaker&quot; ~ &quot;blueviolet&quot;,
+                      job_title == &quot;Milliner; dressmaker&quot; ~ &quot;blueviolet&quot;,
+                      job_title == &quot;Tailor&quot; ~ &quot;blue&quot;,
+                      job_title == &quot;Milliner; mantuamaker&quot; ~ &quot;magenta&quot;,
+                      job_title == &quot;Milliner; Mantua-Maker&quot; ~ &quot;magenta&quot;,
+                      job_title == &quot;Mantuamaker; Milliner&quot; ~ &quot;magenta&quot;,
+                      job_title == &quot;Tailoress; apprentices&quot; ~ &quot;orange&quot;),
+    color = &quot;black&quot;,
+    stroke = TRUE, 
+    weight = 2,
+    fillOpacity = 0.5,
+    popup = ~popup) %&gt;% 
+  addLayersControl(
+    baseGroups = c(&quot;OSM (default)&quot;, &quot;Toner&quot;, &quot;Toner Lite&quot;),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+worcester_map</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addProviderTiles","args":["Stamen.Toner",null,"Toner",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["Stamen.TonerLite",null,"Toner Lite",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircleMarkers","args":[[42.2714065751301,42.2474145942091,42.2710336267407,42.271114127695,42.2582413945088,42.2674575224591,42.2697210081039,42.2599188054923,42.2643451663083,42.2469689052685,42.2683217714447,42.2639881668488,42.2679982504871,42.2503036032456,42.2616672014972,42.2712204233971,42.2660858297902,42.2589068036774,42.2682337476894,42.2696446063283,42.2662055378711,42.2664321496574,42.2698924798553,42.2684512284475,42.2654161399163,42.2700678731749,42.2365692400161,42.2573998493847,42.2681814593489,42.2599747356721,42.2692141162785,42.2711334349807,42.2909535072722,42.2697256500568,42.263044656885,42.25812475143,42.2650708602208,42.2569445128782,42.2603058974047,42.2601184768951,42.2577400089849,42.2685868660061,42.2579239312603,42.2583038391318,42.2471053862376,42.2641064389115,42.264076964657,42.2685689361368,42.5881166300946,42.265273903569,42.2700140921772,42.2601830826763,42.2447945769952,42.263423687565,42.257839590729,42.2709558479903,42.2705316605739,42.2690097762011,42.2706551544782,42.2689230872257,42.2655603179028,42.2695652580761,42.2619430480938,42.2705629659844,42.2695145776523,42.2705298029839,42.2674905165614,42.265394007398,42.2679013952905,42.2694574397617,42.2706815439288,42.2414442967654,42.2704395541431,42.2619550185513,42.2708212618612,42.2635757150173,42.2700467509146,42.2700452381376,42.2705509674441,42.2685640471449,42.2702860974022,42.2689333432149,42.2710427065741,42.2683223619139,42.2654860485749,42.2711194712717],[-71.7994184502656,-71.7900942249575,-71.7993181182762,-71.7991427312185,-71.797296519483,-71.7981162901161,-71.7996770602883,-71.7978072183635,-71.8007336471497,-71.7724497982607,-71.7984844535159,-71.8004708075464,-71.7994762375981,-71.7699486006083,-71.7942253900587,-71.8001248475673,-71.7952851720964,-71.8025450802992,-71.7987757163533,-71.8003399737666,-71.7915974369577,-71.7959582610661,-71.7992113210815,-71.7993181357813,-71.7914564070359,-71.8003826109188,-71.8293968889627,-71.7984036782443,-71.8015457441961,-71.802257952541,-71.7990789637935,-71.8001048316438,-71.7821621947932,-71.7979082787217,-71.8004100104188,-71.7984372642349,-71.7950792021132,-71.7984134673352,-71.7956910744804,-71.8008838365627,-71.7973691323113,-71.7979940830718,-71.7968850556129,-71.7980418620052,-71.7720683416048,-71.8011086775397,-71.8008652515408,-71.7976650673982,-71.9989920828803,-71.7919153877277,-71.8001814865447,-71.8005651671391,-71.8368827148371,-71.8012613736834,-71.7966464027063,-71.7991619988333,-71.7998197276763,-71.7987841023203,-71.7994488442346,-71.8015550954849,-71.7918109063209,-71.7996689274919,-71.7989857357079,-71.7997912250697,-71.799519615349,-71.8000098914698,-71.7986645162617,-71.7955062289218,-71.7984053913467,-71.797481090601,-71.799242879514,-71.8656632306535,-71.7998570274255,-71.7993332024825,-71.7994309709329,-71.8007347492063,-71.799225502447,-71.7996873185047,-71.7992066313639,-71.8012092314338,-71.7991709947593,-71.7995228033116,-71.799466306413,-71.7986236345339,-71.7950910086449,-71.798928657092],6,null,null,{"interactive":true,"className":"","stroke":true,"color":"black","weight":2,"opacity":0.5,"fill":true,"fillColor":["blueviolet","lightgreen","blueviolet","blueviolet","lightskyblue","lightskyblue","lightskyblue","lightskyblue","yellow","yellow","yellow","yellow","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","yellow","yellow","yellow","purple","purple","purple","purple","purple","purple","purple","purple","purple","purple","purple","purple"],"fillOpacity":0.5},null,null,["<b> Miss Winchester <\/b> <br> 1843 <br> Milliner; Dressmaker <br> 27 Main Street, Worcester, MA <br> Worcester Palladium","<b> Mrs. Towne <\/b> <br> 1844 <br> Store owner <br> 7 Granite Block, Worcester, MA <br> Worcester Palladium","<b> Miss Winchester <\/b> <br> 1846 <br> Milliner; Dressmaker <br> 47 Main Street, Worcester, MA <br> Worcester Palladium","<b> Miss Winchester <\/b> <br> 1847 <br> Milliner; Dressmaker <br> 47 Main Street, Worcester, MA <br> Worcester Palladium","<b> Goldthwait P <\/b> <br> 1844 <br> Dressmaker <br> Brown St/Pond St, Worcester, MA <br> Worcester City Directory","<b> Persis Goldthwait <\/b> <br> 1844 <br> Dressmaker <br> Thomas St, Worcester, MA <br> Worcester City Directory","<b> Sarah R. Parmenter <\/b> <br> 1844 <br> Dressmaker <br> 78 Main St, Worcester, MA <br> Worcester City Directory","<b> Susan Richards <\/b> <br> 1844 <br> Dressmaker <br> 14 Green St, Worcester, MA <br> Worcester City Directory","<b> Clarissa Corey <\/b> <br> 1844 <br> Tailoress <br> Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Lucy R. Pease <\/b> <br> 1844 <br> Tailoress <br> Corner of Mechanic and Short Streets, Worcester, MA <br> Worcester City Directory","<b> Mercy Goldthwait <\/b> <br> 1844 <br> Tailoress <br> Thomas St, Worcester, MA <br> Worcester City Directory","<b> Sarah Geer <\/b> <br> 1844 <br> Tailoress <br> Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Sophronia Willard <\/b> <br> 1844 <br> Dressmaker <br> Hind's Court, Worcester, MA <br> Worcester City Directory","<b> Mary Davis <\/b> <br> 1844 <br> Dressmaker <br> Grafton St., Worcester, MA <br> Worcester City Directory","<b> Miss Drury <\/b> <br> 1844 <br> Dressmaker <br> Washington Square, Worcester, MA <br> Worcester City Directory","<b> Mrs. Felton <\/b> <br> 1844 <br> Dressmaker <br> 57 Main St, Worcester, MA <br> Worcester City Directory","<b> Sally Flagg <\/b> <br> 1844 <br> Dressmaker <br> Summer St, Worcester, MA <br> Worcester City Directory","<b> Hannah E. Freeman <\/b> <br> 1844 <br> Dressmaker <br> Myrtle St, Worcester, MA <br> Worcester City Directory","<b> Persis Goldthwait <\/b> <br> 1844 <br> Dressmaker <br> Thomas St, Worcester, MA <br> Worcester City Directory","<b> E. Goodale <\/b> <br> 1844 <br> Dressmaker <br> 93 Main St, Worcester, MA <br> Worcester City Directory","<b> S.E. Hart <\/b> <br> 1844 <br> Dressmaker <br> Central St, Worcester, MA <br> Worcester City Directory","<b> Harriet Howland <\/b> <br> 1844 <br> Dressmaker <br> Summer St, Worcester, MA <br> Worcester City Directory","<b> D. Hunter <\/b> <br> 1844 <br> Dressmaker <br> 85 Main St, Worcester, MA <br> Worcester City Directory","<b> Lydia A. Jencks <\/b> <br> 1844 <br> Dressmaker <br> 147 Main, Worcester, MA <br> Worcester City Directory","<b> Elizabeth C. Kinney <\/b> <br> 1844 <br> Dressmaker <br> Central St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Lawrence <\/b> <br> 1844 <br> Dressmaker <br> 94 Main St, Worcester, MA <br> Worcester City Directory","<b> Lucretia Larnard <\/b> <br> 1844 <br> Dressmaker <br> Pine St, Worcester, MA <br> Worcester City Directory","<b> Sally Morse <\/b> <br> 1844 <br> Dressmaker <br> Green St, Worcester, MA <br> Worcester City Directory","<b> Nancy Muzzy <\/b> <br> 1844 <br> Dressmaker <br> 164 Main St, Worcester, MA <br> Worcester City Directory","<b> Louisa Newton <\/b> <br> 1844 <br> Dressmaker <br> Myrtle St, Worcester, MA <br> Worcester City Directory","<b> M. Orcutt <\/b> <br> 1844 <br> Dressmaker <br> 127 Main St, Worcester, MA <br> Worcester City Directory","<b> Sarah R. Parmenter <\/b> <br> 1844 <br> Dressmaker <br> 78 Main St, Worcester, MA <br> Worcester City Directory","<b> Jane Puffer <\/b> <br> 1844 <br> Dressmaker <br> Lincoln St, Worcester, MA <br> Worcester City Directory","<b> Elizabeth Rice <\/b> <br> 1844 <br> Dressmaker <br> Union St, Worcester, MA <br> Worcester City Directory","<b> N. Reed <\/b> <br> 1844 <br> Dressmaker <br> Corner of Short St and Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Susan Richards <\/b> <br> 1844 <br> Dressmaker <br> Green St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Riley <\/b> <br> 1844 <br> Dressmaker <br> Summer St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Thomas Rogers <\/b> <br> 1844 <br> Dressmaker <br> Green St, Worcester, MA <br> Worcester City Directory","<b> M.S. Ruggles <\/b> <br> 1844 <br> Dressmaker <br> Temple St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Shumway <\/b> <br> 1844 <br> Dressmaker <br> Salem St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Benoni Smith <\/b> <br> 1844 <br> Dressmaker <br> Pond St, Worcester, MA <br> Worcester City Directory","<b> Mary Smith <\/b> <br> 1844 <br> Dressmaker <br> Old Market St, Worcester, MA <br> Worcester City Directory","<b> Harriet Wheeler <\/b> <br> 1844 <br> Dressmaker <br> Pond St near Winter, Worcester, MA <br> Worcester City Directory","<b> Sophronia Willard <\/b> <br> 1844 <br> Dressmaker <br> Green St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Clarissa Corey <\/b> <br> 1844 <br> Tailoress <br> Short St, Worcester, MA <br> Worcester City Directory","<b> Servilla Colman <\/b> <br> 1844 <br> Tailoress <br> Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Sarah A. Geer <\/b> <br> 1844 <br> Tailoress <br> Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Mercy Goldthwait <\/b> <br> 1844 <br> Tailoress <br> Thomas St, Worcester, MA <br> Worcester City Directory","<b> Sarah P. Howard <\/b> <br> 1844 <br> Tailoress <br> Park St, Worcester, MA <br> Worcester City Directory","<b> S. Howard <\/b> <br> 1844 <br> Tailoress <br> Central St, Worcester, MA <br> Worcester City Directory","<b> Miss Howard <\/b> <br> 1844 <br> Tailoress <br> 83 Main St, Worcester, MA <br> Worcester City Directory","<b> Miss Johnson <\/b> <br> 1844 <br> Tailoress <br> Salem St, Worcester, MA <br> Worcester City Directory","<b> Louisa A. Miller <\/b> <br> 1844 <br> Tailoress <br> Main St, Worcester, MA <br> Worcester City Directory","<b> Lucy R. Pease <\/b> <br> 1844 <br> Tailoress <br> Corner of Short St and Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Jonathan Rice <\/b> <br> 1844 <br> Tailoress <br> Pond St near Green, Worcester, MA <br> Worcester City Directory","<b> Mrs. Baker <\/b> <br> 1842 <br> Dressmaker <br> 71 Main St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Felton <\/b> <br> 1842 <br> Dressmaker <br> 57 Main St, Worcester, MA <br> Worcester City Directory","<b> Misses Goldthwait <\/b> <br> 1842 <br> Dressmaker <br> 107 Main St, Worcester, MA <br> Worcester City Directory","<b> E. Goodale <\/b> <br> 1842 <br> Dressmaker <br> 93 Main St, Worcester, MA <br> Worcester City Directory","<b> H.M. Haynes <\/b> <br> 1842 <br> Dressmaker <br> 164 Main St, Worcester, MA <br> Worcester City Directory","<b> S.E. Hart <\/b> <br> 1842 <br> Dressmaker <br> Central St, Worcester, MA <br> Worcester City Directory","<b> Dolly Hunter <\/b> <br> 1842 <br> Dressmaker <br> 85 Main St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Lawrence <\/b> <br> 1842 <br> Dressmaker <br> Front St, Worcester, MA <br> Worcester City Directory","<b> Miss Muzzy <\/b> <br> 1842 <br> Dressmaker <br> Lincoln Square, Worcester, MA <br> Worcester City Directory","<b> M. Orcutt <\/b> <br> 1842 <br> Dressmaker <br> 127 Main St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Parmenter <\/b> <br> 1842 <br> Dressmaker <br> 78 Main St, Worcester, MA <br> Worcester City Directory","<b> M.A. Perry & Co. <\/b> <br> 1842 <br> Dressmaker <br> Thomas St, Worcester, MA <br> Worcester City Directory","<b> A.E. Pollard <\/b> <br> 1842 <br> Dressmaker <br> Summer St, Worcester, MA <br> Worcester City Directory","<b> Mary E. Rice <\/b> <br> 1842 <br> Dressmaker <br> School St, Worcester, MA <br> Worcester City Directory","<b> M.J. Walcott <\/b> <br> 1842 <br> Dressmaker <br> Market St, Worcester, MA <br> Worcester City Directory","<b> F. Winchester <\/b> <br> 1842 <br> Dressmaker <br> 47 Main St, Worcester, MA <br> Worcester City Directory","<b> S. Howard <\/b> <br> 1842 <br> Tailoress <br> 21 Main St, Worcester, MA <br> Worcester City Directory","<b> L.A. Miller <\/b> <br> 1842 <br> Tailoress <br> 83 Main St, Worcester, MA <br> Worcester City Directory","<b> Miss Rich <\/b> <br> 1842 <br> Tailoress <br> Front St, Worcester, MA <br> Worcester City Directory","<b> Mr. Baker <\/b> <br> 1842 <br> Milliner <br> 71 Main St, Worcester, MA <br> Worcester City Directory","<b> Eliza Duncan <\/b> <br> 1842 <br> Milliner <br> Mechanic St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Felton <\/b> <br> 1842 <br> Milliner <br> 57 Main St, Worcester, MA <br> Worcester City Directory","<b> Misses Goldthwait <\/b> <br> 1842 <br> Milliner <br> 107 Main St, Worcester, MA <br> Worcester City Directory","<b> E. Goodale <\/b> <br> 1842 <br> Milliner <br> 93 Main St, Worcester, MA <br> Worcester City Directory","<b> H.M. Haynes <\/b> <br> 1842 <br> Milliner <br> 164 Main St, Worcester, MA <br> Worcester City Directory","<b> Dolly Hunter <\/b> <br> 1842 <br> Milliner <br> 85 Main St, Worcester, MA <br> Worcester City Directory","<b> M. Orcutt <\/b> <br> 1842 <br> Milliner <br> 127 Main St, Worcester, MA <br> Worcester City Directory","<b> Mrs. Parmenter <\/b> <br> 1842 <br> Milliner <br> 78 Main St, Worcester, MA <br> Worcester City Directory","<b> Mary Ann Perry & Co. <\/b> <br> 1842 <br> Milliner <br> Thomas St, Worcester, MA <br> Worcester City Directory","<b> A.E. Pollard <\/b> <br> 1842 <br> Milliner <br> Summer St, Worcester, MA <br> Worcester City Directory","<b> F. Winchester <\/b> <br> 1842 <br> Milliner <br> 47 Main St, Worcester, MA <br> Worcester City Directory"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["OSM (default)","Toner","Toner Lite"],[],{"collapsed":false,"autoZIndex":true,"position":"topright"}]}],"limits":{"lat":[42.2365692400161,42.5881166300946],"lng":[-71.9989920828803,-71.7699486006083]}},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="locations-of-all-points-in-seamstress-set" class="section level2">
+<h2>Locations of all Points in Seamstress Set</h2>
+<pre class="r"><code>ma_map &lt;- leaflet(data = ma_geo) %&gt;% 
+  addTiles(group = &quot;OSM&quot;) %&gt;%
+  addProviderTiles(providers$Stamen.Toner, group = &quot;Toner&quot;) %&gt;%
+  addProviderTiles(providers$Stamen.TonerLite, group = &quot;Toner Lite&quot;) %&gt;% 
+  addCircleMarkers(
+    radius = 6,
+    fillColor = ~case_when(job_title == &quot;Dressmaker&quot; ~ &quot;lightskyblue&quot;,
+                      job_title == &quot;Milliner&quot; ~ &quot;purple&quot;,
+                      job_title == &quot;Tailoress&quot; ~ &quot;yellow&quot;,
+                      job_title == &quot;Store Owner&quot; ~ &quot;lightgreen&quot;,
+                      job_title == &quot;Store owner&quot; ~ &quot;lightgreen&quot;,
+                      job_title == &quot;Milliner; Dressmaker&quot; ~ &quot;blueviolet&quot;,
+                      job_title == &quot;Milliner; dressmaker&quot; ~ &quot;blueviolet&quot;,
+                      job_title == &quot;Tailor&quot; ~ &quot;blue&quot;,
+                      job_title == &quot;Milliner; mantuamaker&quot; ~ &quot;magenta&quot;,
+                      job_title == &quot;Milliner; Mantua-Maker&quot; ~ &quot;magenta&quot;,
+                      job_title == &quot;Mantuamaker; Milliner&quot; ~ &quot;magenta&quot;,
+                      job_title == &quot;Tailoress; apprentices&quot; ~ &quot;orange&quot;),
+    color = &quot;black&quot;,
+    stroke = TRUE, 
+    weight = 2,
+    fillOpacity = 0.5,
+    popup = ~ma_popup) %&gt;% 
+  addLayersControl(
+    baseGroups = c(&quot;OSM (default)&quot;, &quot;Toner&quot;, &quot;Toner Lite&quot;),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+ma_map</code></pre>
+<div id="htmlwidget-2" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addProviderTiles","args":["Stamen.Toner",null,"Toner",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["Stamen.TonerLite",null,"Toner Lite",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircleMarkers","args":[[42.7720600707309,42.4811246836077,42.4622649246452,42.4631226634816,42.7782953208462,42.4636958110181,42.4631871027775,42.2652113847032,42.2647856991807,42.239750682556,42.0746330871406,42.3923384655745,42.2706472175991,42.0716284864999,42.3777851413773,42.2306850800407,42.6379358402695,42.4468497678532,42.4456573041467,42.4484850758177,42.3949431638082,42.4494035929422,42.4541322380895,42.4533504460523,42.4268682523924,42.4511731892529,42.4471664906732,42.247376170624,42.3961929037793,42.6291488093605,42.4537057692409,42.4531843854566,42.4455083464824,42.4451913842065,42.8125245896509,42.6348611703944,42.4488401590029,42.4517126829665,42.4522492262048,42.4491489801403,42.373421973169,42.5176723199096,42.4196406742819,42.3211806051883,42.4235547831866,42.4258829548859,42.4565905310617,42.2660125493252,42.2627218643904,42.2662255813601,42.2667969470252,42.2675201675694,42.811761702333,42.3239713484435,42.6351791024317,42.4520986886061,42.6323928971113,42.3699656796255,42.106221962155,42.4194019465271,42.4807063465269,42.4263587250797,42.4250204497419,42.4207179910939,42.3235491245178,42.3293792405391,42.4795165787351,42.4225061857743,42.4267314684084,42.6299655958622,42.2580703498388,42.2606100758637,42.2609120840953,42.2581619341908,42.2591914631687,42.2629268098639,42.2670741549574,42.2656826159504,42.2619619519386,42.2664514468929,42.2608512632742,42.6382656214282,42.6360512623709,42.6310752528955,42.6373427985439,42.6361559523046,42.1109635496239,42.6296538700927,42.6092330984449,42.6109853080543,42.5845135286554,42.5968318349836,42.4188514869601,42.5598040103857],[-71.0787179430007,-71.4301454163355,-71.3465088846168,-71.3514762690352,-71.078798229749,-71.3485407211589,-71.3481547591277,-71.8049176479936,-72.0844887061992,-71.9917923057444,-72.0306015611166,-72.7321781229525,-72.6661774922556,-72.0361810031447,-72.5195487548055,-72.7291150326299,-71.313522990406,-73.2428163263499,-73.2477537539816,-73.2419816783634,-72.8372005532033,-73.244805126125,-73.2475515470464,-73.2470937401399,-72.1043151269518,-73.2432229492906,-73.2469678109434,-73.2069323323716,-72.8386552084967,-71.3194290184014,-73.2465608512915,-73.2446943364824,-73.24497151252,-73.2476712577419,-70.8762576264014,-71.3190138276094,-73.2449224116291,-73.2422087461072,-73.2452608534153,-73.2427606425078,-72.5229100801504,-73.2315118645831,-72.1069214467847,-72.6413567052777,-72.1052796309657,-72.1078924033922,-71.3511961506035,-71.8058904918993,-71.8057293738548,-71.8008142707841,-71.8050176630907,-71.8016479602471,-70.877627006278,-72.6427159766537,-71.3163733373208,-71.67544808976,-71.3162950839754,-72.5218574049585,-72.0764290894217,-72.1032210404835,-72.1875624256814,-72.1022919099888,-72.1074318230838,-72.1074021155624,-72.6435831734883,-72.6407616501085,-72.1839624719576,-72.1032763635744,-72.1037711281235,-71.3141820875364,-71.8057986091932,-71.8005073698381,-71.7990437017827,-71.8042895154909,-71.8039469648601,-71.8051541208914,-71.8004519179902,-71.7996836569447,-71.8019519641277,-71.8012331964095,-71.8037622260484,-71.3191459658634,-71.3126263658582,-71.3183363019945,-71.3192762492866,-71.3193783862365,-72.0765381952577,-71.3135836520412,-71.5772798251215,-71.5756953953983,-72.6029006523843,-72.2254687499561,-72.103589137165,-72.0701479741043],6,null,null,{"interactive":true,"className":"","stroke":true,"color":"black","weight":2,"opacity":0.5,"fill":true,"fillColor":["yellow","magenta","magenta","magenta","yellow","blueviolet","magenta","magenta","magenta","magenta",null,"blueviolet","magenta","blue","yellow","magenta","blueviolet","blueviolet",null,"lightskyblue","magenta","magenta","blueviolet","blueviolet","blueviolet","blueviolet","blueviolet","blueviolet","magenta","yellow","blueviolet","blueviolet","blueviolet","lightskyblue","purple","blueviolet","blueviolet",null,"purple","purple","blueviolet","blueviolet",null,"yellow","blueviolet","blueviolet","blueviolet","blueviolet","lightgreen","blueviolet","lightskyblue","blueviolet","lightskyblue",null,"blueviolet","orange",null,"orange","yellow","blueviolet",null,null,"yellow","orange",null,null,"blue","purple","orange",null,"lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","lightskyblue","yellow","yellow","yellow","yellow","lightskyblue",null,null,null,null,null,"blue",null,null,null,null,"blueviolet","blueviolet","yellow"],"fillOpacity":0.5},null,null,["<b> Mehitable Emerson <\/b> <br> 1810 <br> Tailoress <br> Haverhill, MA <br> Merrimack Intelligencer","<b> Betsey Robbins <\/b> <br> 1818 <br> Milliner; mantuamaker <br> Acton, MA <br> Middlesex Gazette","<b> Betsey Robbins <\/b> <br> 1819 <br> Milliner; mantuamaker <br> Concord, MA <br> Middlesex Gazette","<b> Betsey Robbins <\/b> <br> 1820 <br> Milliner; mantuamaker <br> Concord, MA <br> Middlesex Gazette","<b> Ruth W. Messer <\/b> <br> 1823 <br> Tailoress <br> Haverhill, MA <br> Haverhill Gazette","<b> Betsey W. Dakin <\/b> <br> 1825 <br> Milliner; dressmaker <br> Concord, MA <br> Concord Gazette and Middlesex Yeoman","<b> Ann Prescott <\/b> <br> 1825 <br> Milliner; mantuamaker <br> Concord, MA <br> Concord Gazette and Middlesex Yeoman","<b> Miss C. Cloyes <\/b> <br> 1826 <br> Milliner; Mantua-Maker <br> Worcester, MA <br> Massachusetts Spy","<b> T.W. Convers <\/b> <br> 1828 <br> Milliner; mantuamaker <br> North Brookfield, MA <br> Massachusetts Spy","<b> A. Convers <\/b> <br> 1828 <br> Milliner; mantuamaker <br> Spencer, MA <br> Massachusetts Spy","<b> S. Whitney <\/b> <br> 1830 <br> Dressmaker; Mantuamaker <br> Southbridge, MA <br> Southbridge Register","<b> J.A. Pomeroy <\/b> <br> 1830 <br> Milliner; Dressmaker <br> Williamsburg, MA <br> Hampshire Gazette","<b> Mrs. Gillett <\/b> <br> 1830 <br> Milliner; Mantua-Maker <br> Easthampton, MA <br> Hampshire Gazette","<b> Bradford Baylies <\/b> <br> 1830 <br> Tailor <br> Southbridge, MA <br> Southbridge Register; and Farmers; Mechanics and Manufacturers Advocate","<b> Miss S. Pomroy <\/b> <br> 1830 <br> Tailoress <br> Amherst, MA <br> Hampshire Gazette","<b> Clarissa Trumbull; Mary Ann Nash <\/b> <br> 1831 <br> Mantuamaker; Milliner <br> Southampton, MA <br> Hampshire Gazette","<b> S. Sanders <\/b> <br> 1831 <br> Milliner; dressmaker <br> Lowell, MA <br> Middlesex Telegraph and Manufacturers' and Farmers' Advocate","<b> Mariett Ingham <\/b> <br> 1831 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> J. Stevens; Mrs. Stevens <\/b> <br> 1831 <br> Store owner; Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Miss M. Dunham; Miss A. Dunham <\/b> <br> 1832 <br> Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Mary W. Lee <\/b> <br> 1832 <br> Mantuamaker; Milliner <br> Chesterfield, MA <br> Hampshire Gazette","<b> Miss M. Brown <\/b> <br> 1832 <br> Milliner; Mantua-Maker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Mariett Ingham; Emily E. Ingham <\/b> <br> 1833 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Susan Ingham <\/b> <br> 1833 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Miss L. Johnson <\/b> <br> 1834 <br> Milliner; Dressmaker <br> Barre, MA <br> Farmer's Gazette","<b> S.T. Bodurtha <\/b> <br> 1835 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Miss Davis; Miss Beckwith <\/b> <br> 1835 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Sarah L. Ackley <\/b> <br> 1835 <br> Milliner; Dressmaker <br> Tyringham, MA <br> Pittsfield Sun","<b> Mary S. Bowe <\/b> <br> 1835 <br> Milliner; Mantua-Maker <br> Chesterfield, MA <br> Hampshire Gazette","<b> Hannah Skinner <\/b> <br> 1835 <br> Tailoress <br> Lowell, MA <br> Lowell Patriot","<b> Miss Davis; Miss Beckwith <\/b> <br> 1836 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Miss Davis; Miss Beckwith <\/b> <br> 1836 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> S.T. Bodurtha <\/b> <br> 1836 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Minerva Pelton <\/b> <br> 1837 <br> Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Ann A. Woodbury <\/b> <br> 1837 <br> Milliner <br> Newburyport, MA <br> Newburyport Morning Herald","<b> E.W. Freeman <\/b> <br> 1837 <br> Milliner; dressmaker <br> Lowell, MA <br> Lowell Patriot","<b> Miss Davis <\/b> <br> 1837 <br> Milliner; Dressmaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Mrs. Julia Jernigan <\/b> <br> 1838 <br> Mantuamaker <br> Pittsfield, MA <br> Pittsfield Sun","<b> Miss Davis <\/b> <br> 1838 <br> Milliner <br> Pittsfield, MA <br> Pittsfield Sun","<b> Mrs. Stevens <\/b> <br> 1838 <br> Milliner <br> Pittsfield, MA <br> Pittsfield Sun","<b> C.E. Taylor <\/b> <br> 1838 <br> Milliner; Dressmaker <br> Amherst, MA <br> Hampshire Gazette","<b> Mrs. Cook <\/b> <br> 1838 <br> Milliner; Dressmaker <br> Lanesborough, MA <br> Pittsfield Sun","<b> Mary C. McFarlin <\/b> <br> 1838 <br> Milliner; Mantuamaker <br> Barre, MA <br> Barre Weekly Gazette","<b> Miss S. Pomroy; Miss F. Stanley <\/b> <br> 1838 <br> Tailoress <br> Northampton, MA <br> Hampshire Gazette","<b> Miss Flint <\/b> <br> 1839 <br> Milliner; Dressmaker <br> Barre, MA <br> Barre Gazette","<b> Miss Flint <\/b> <br> 1839 <br> Milliner; Dressmaker <br> Barre, MA <br> Hampshire Gazette","<b> Sarah D. Richardson <\/b> <br> 1841 <br> Milliner; dressmaker <br> Concord, MA <br> Concord Gazette and Middlesex Yeoman","<b> Miss Winchester <\/b> <br> 1843 <br> Milliner; Dressmaker <br> Worcester, MA <br> Worcester Palladium","<b> Mrs. Towne <\/b> <br> 1844 <br> Store owner <br> Worcester, MA <br> Worcester Palladium","<b> Miss Winchester <\/b> <br> 1846 <br> Milliner; Dressmaker <br> Worcester, MA <br> Worcester Palladium","<b> Miss Winchester <\/b> <br> 1847 <br> Dressmaker <br> Worcester, MA <br> Worcester Palladium","<b> Miss Winchester <\/b> <br> 1847 <br> Milliner; Dressmaker <br> Worcester, MA <br> Worcester Palladium","<b> Abby W. Follansbee <\/b> <br> 1837 <br> Dressmaker <br> Newburyport, MA <br> Newburyport Morning Herald","<b> Mrs. Flint <\/b> <br> 1831 <br> Milliner; Mantua-Maker; apprentices <br> Northampton, MA <br> Hampshire Gazette","<b> Sophronia Lyman <\/b> <br> 1832 <br> Milliner; dressmaker <br> Lowell, MA <br> Middlesex Telegraph and Manufacturers' and Farmers' Advocate","<b> John A. Haskell <\/b> <br> 1834 <br> Tailoress; apprentices <br> Lancaster, MA <br> Massachusetts Spy","<b> John Putney <\/b> <br> 1835 <br> Tailor; tailoress <br> Lowell, MA <br> Lowell Patriot","<b> T. Kimberley <\/b> <br> 1835 <br> Tailoress; apprentices <br> Amherst, MA <br> Hampshire Gazette","<b> Mr. Hudson <\/b> <br> 1836 <br> Tailoress <br> Sturbridge, MA <br> Springfield Republican","<b> E. Maria Parker <\/b> <br> 1839 <br> Milliner; Dressmaker <br> Barre, MA <br> Barre Gazette","<b> A.W. Wait <\/b> <br> 1839 <br> Tailor; apprentices <br> Petersham, MA <br> Barre Gazette","<b> N. Dunham <\/b> <br> 1839 <br> Tailor; tailoress <br> Barre, MA <br> Barre Gazette","<b> Wm. H. Hull <\/b> <br> 1839 <br> Tailoress <br> Barre, MA <br> Hampshire Gazette","<b> Wm. H. Hull <\/b> <br> 1839 <br> Tailoress; apprentices <br> Barre, MA <br> Barre Gazette","<b> Miss S. Osborn; Miss C. Osborn <\/b> <br> 1832 <br> Milliner; Dressmaker; apprentices <br> Northampton, MA <br> Hampshire Gazette","<b> Miss S. Osborn; Miss C. Osborn <\/b> <br> 1833 <br> Milliner; Dressmaker; apprentices <br> Northampton, MA <br> Hampshire Gazette","<b> Stephen Whiting <\/b> <br> 1835 <br> Tailor <br> Petersham, MA <br> Farmer's Gazette","<b> Sarah W. Hathaway <\/b> <br> 1836 <br> Milliner <br> Barre, MA <br> Barre Gazette","<b> F. Kilner <\/b> <br> 1839 <br> Tailoress; apprentices <br> Barre, MA <br> Barre Gazette","<b> Sarah Sanders; Sanders sisters <\/b> <br> 1835 <br> Dressmaker; milliner <br> Lowell, MA <br> Lowell City Directory","<b> Hannah E. Freeman <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> Lucina Grover <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> Goldthwait P <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> Persis Goldthwait <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> Sarah R. Parmenter <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> Susan Richards <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> Clarissa Corey <\/b> <br> 1844 <br> Tailoress <br> Worcester, MA <br> Worcester City Directory","<b> Lucy R. Pease <\/b> <br> 1844 <br> Tailoress <br> Worcester, MA <br> Worcester City Directory","<b> Mercy Goldthwait <\/b> <br> 1844 <br> Tailoress <br> Worcester, MA <br> Worcester City Directory","<b> Sarah Geer <\/b> <br> 1844 <br> Tailoress <br> Worcester, MA <br> Worcester City Directory","<b> Sophronia Willard <\/b> <br> 1844 <br> Dressmaker <br> Worcester, MA <br> Worcester City Directory","<b> C. Hubbard <\/b> <br> 1833 <br> NA <br> Lowell, MA <br> Lowell Mercury","<b> NA <\/b> <br> 1833 <br> NA <br> Lowell, MA <br> Lowell Observer","<b> NA <\/b> <br> 1833 <br> NA <br> Lowell, MA <br> Lowell Observer","<b> C. Mears <\/b> <br> 1836 <br> NA <br> Lowell, MA <br> Lowell Journal","<b> NA <\/b> <br> 1836 <br> NA <br> Lowell, MA <br> Lowell Courier","<b> Samuel A. Hudson; A.M. Merrick <\/b> <br> 1837 <br> Tailor <br> Sturbridge, MA <br> Massachusetts Spy","<b> Henry C. Gillis <\/b> <br> 1838 <br> NA <br> Lowell, MA <br> Lowell Courier","<b> H.A. Woods <\/b> <br> 1854 <br> NA <br> Groton, MA <br> Railroad Mercury","<b> G.W. Shattuck <\/b> <br> 1859 <br> NA <br> Groton, MA <br> Railroad Mercury","<b> S. Hammond <\/b> <br> 1824 <br> Tailor; milliner; mantuamaker <br> Greenfield, MA <br> NA","<b> Saraphinia P. Young <\/b> <br> 1828 <br> Milliner; dressmaker <br> Athol, MA <br> NA","<b> Mary Ann Foster <\/b> <br> 1836 <br> Milliner; dressmaker <br> Barre, MA <br> NA","<b> Mehitable French <\/b> <br> 1844 <br> Tailoress <br> Templeton, MA <br> NA"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["OSM (default)","Toner","Toner Lite"],[],{"collapsed":false,"autoZIndex":true,"position":"topright"}]}],"limits":{"lat":[42.0716284864999,42.8125245896509],"lng":[-73.2477537539816,-70.8762576264014]}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>genealogy_map &lt;- leaflet(data = genealogy_geo) %&gt;% 
+  addTiles(group = &quot;OSM&quot;) %&gt;%
+  addProviderTiles(providers$Stamen.Toner, group = &quot;Toner&quot;) %&gt;%
+  addProviderTiles(providers$Stamen.TonerLite, group = &quot;Toner Lite&quot;) %&gt;% 
+  addCircleMarkers(
+    radius = 6,
+    fillColor = &quot;#9cc1d1&quot;,
+    color = &quot;black&quot;,
+    stroke = TRUE, 
+    weight = 2,
+    fillOpacity = 0.75,
+    popup = ~genealogy_popup) %&gt;% 
+  addLayersControl(
+    baseGroups = c(&quot;OSM (default)&quot;, &quot;Toner&quot;, &quot;Toner Lite&quot;),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+genealogy_map</code></pre>
+<div id="htmlwidget-3" style="width:672px;height:480px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-3">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,"OSM",{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addProviderTiles","args":["Stamen.Toner",null,"Toner",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addProviderTiles","args":["Stamen.TonerLite",null,"Toner Lite",{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircleMarkers","args":[[42.3895180265697,42.4443130522034,42.0773753559154,42.2720143109459,42.2642674627462,42.2581388018151,42.248675351945,42.2609062819409,42.2422740014404,42.228840029479,42.2255387593953,42.2707591353013,42.4132923691456,42.263709558913,42.8114288055873,42.8067890497621,42.3001424109051,42.2699509903932,42.2674670123046,42.2682779487969],[-72.8408343157012,-73.2515620598304,-72.0354506245871,-71.7977538009477,-71.7967179266708,-71.8014588287711,-71.8764900311402,-71.8031053617643,-71.7726898425039,-72.7264123970794,-72.7269425382511,-71.8031319238333,-71.6782261936223,-71.7985391397806,-70.8647698419138,-70.8650552898683,-73.2500353618598,-71.800830956132,-71.7960047090726,-71.7994642345875],6,null,null,{"interactive":true,"className":"","stroke":true,"color":"black","weight":2,"opacity":0.5,"fill":true,"fillColor":"#9cc1d1","fillOpacity":0.75},null,null,["<b> Mary W. Lee Bissell <\/b> <br> Birth Date:  1796 <br> Parents:  NA  and  NA <br> Spouse:  Benjamin Pierce Bissell <br> Marriage Date:  NA <br> Address:  Chesterfield, MA <br> Death Date:  13 April 1846 <br><img src= https://i.pinimg.com/564x/1c/37/19/1c3719c73f27a120022f80dd0c33727f.jpg  width = '200'>","<b> Julia Ann Hurlburt Jernigan <\/b> <br> Birth Date:  13 August 1798 <br> Parents:  Timothy Hurlburt  and  Mary Robbins Hurlburt <br> Spouse:  Ryan Jernigan? <br> Marriage Date:  NA <br> Address:  38 Pomeroy Ave, Pittsfield, MA <br> Death Date:  3 November 1885 <br><img src= https://i.pinimg.com/474x/ec/4d/e2/ec4de2bbc251a67ad02247dc94acb7af.jpg  width = '200'>","<b> Sally Litchfield Whitney <\/b> <br> Birth Date:  6 October 1806 <br> Parents:  Comins Litchfield  and  Sally Blanchard <br> Spouse:  Schuyler Whitney <br> Marriage Date:  23 October 1828 <br> Address:  Southbridge, MA <br> Death Date:  26 April 1879 <br><img src= https://i.pinimg.com/474x/ff/41/14/ff4114affb25efe694b3e7d852719c8c.jpg  width = '200'>","<b> Dolly Hunter McMarty? McMurter? <\/b> <br> Birth Date:  29 May 1807 <br> Parents:  Isaac Hunter  and  Lucy Converse Hunter <br> Spouse:  Merit McMurter? McMarty? <br> Marriage Date:  15 August 1857 <br> Address:  85 Main St, Worcester, MA <br> Death Date:  5 September 1874 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Lydia A. Jencks <\/b> <br> Birth Date:  NA <br> Parents:  NA  and  NA <br> Spouse:  NA <br> Marriage Date:  NA <br> Address:  147 Main St, Worcester, MA <br> Death Date:  NA <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Susan M. Richards Pratt <\/b> <br> Birth Date:  1819 <br> Parents:  Reuban Richards  and  Polly Richards <br> Spouse:  Almon Pratt <br> Marriage Date:  19 October 1856 <br> Address:  14 Green St, Worcester, MA <br> Death Date:  NA <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Lucy Lane Johnson Smith <\/b> <br> Birth Date:  24 April 1792 <br> Parents:  John Johnson  and  Lydia Johnson <br> Spouse:  Benoni Smith <br> Marriage Date:  20 September 1820 <br> Address:  Brown St, Worcester, MA <br> Death Date:  24 February 1884 <br><img src= https://i.pinimg.com/564x/06/95/cd/0695cdc820a53abb06cd1c04ea5bfab6.jpg  width = '200'>","<b> Sarah \"Sally\" Geer Driscoll <\/b> <br> Birth Date:  28 October 1821 <br> Parents:  Asa Geer  and  Esther Smith Geer <br> Spouse:  Alonzo M. Driscoll <br> Marriage Date:  11 September 1846 <br> Address:  Mechanic St, Worcester, MA <br> Death Date:  9 April 1889 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Clarissa D. Baker Corey/Cory <\/b> <br> Birth Date:  NA <br> Parents:  NA  and  NA <br> Spouse:  Joseph Cory <br> Marriage Date:  10 November 1844 <br> Address:  Short St, Worcester, MA <br> Death Date:  1894 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Clarissa Nash Trumbull <\/b> <br> Birth Date:  21 March 1793 <br> Parents:  John Nash  and  Martha Nash <br> Spouse:  x Trumbull <br> Marriage Date:  NA <br> Address:  Southampton, MA <br> Death Date:  26 July 1873 <br><img src= https://i.pinimg.com/564x/0e/12/99/0e12994bd1de21a447b86bad3d44bdff.jpg  width = '200'>","<b> Mary Ann Nash Kingsley <\/b> <br> Birth Date:  1812 <br> Parents:  John Nash  and  Abigail Nash <br> Spouse:  Edwin Kingsley <br> Marriage Date:  1854 <br> Address:  Southampton, MA <br> Death Date:  29 January 1890 <br><img src= https://i.pinimg.com/564x/0e/12/99/0e12994bd1de21a447b86bad3d44bdff.jpg  width = '200'>","<b> Relief Smith Felton <\/b> <br> Birth Date:  1795 <br> Parents:  NA  and  NA <br> Spouse:  Josiah D. Felton <br> Marriage Date:  6 November 1816 <br> Address:  57 Main St, Worcester, MA <br> Death Date:  1867 <br><img src= https://i.pinimg.com/564x/11/ea/27/11ea27bed0689dfb9cd1f55747734d26.jpg  width = '200'>","<b> Lucina Grover Dolliver <\/b> <br> Birth Date:  October 1818 <br> Parents:  Lemuel Grover  and  Philena Grover <br> Spouse:  Horatio Dolliver <br> Marriage Date:  17 February 1847 <br> Address:  Beech St, Worcester, MA <br> Death Date:  23 December 1853 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Sophronia Willard Lowd <\/b> <br> Birth Date:  22 February 1798 <br> Parents:  William Willard  and  Sarah Willard <br> Spouse:  George W. Lowd <br> Marriage Date:  8 January 1846 <br> Address:  26 Green St, Worcester, MA <br> Death Date:  16 September 1856 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Abby White Follansbee <\/b> <br> Birth Date:  1808 <br> Parents:  John N. Follansbee  and  Abby White <br> Spouse:  NA <br> Marriage Date:  NA <br> Address:  17 Ship St, Newburyport, MA <br> Death Date:  29 July 1876 <br><img src= https://i.pinimg.com/564x/90/cd/b8/90cdb844303cb22f904c5af290840220.jpg  width = '200'>","<b> Ann A. Woodbury Knapp <\/b> <br> Birth Date:  1816 <br> Parents:  Eliphalet Woodbury  and  Abigail Woodbury <br> Spouse:  Isaac Knapp <br> Marriage Date:  22 June 1841 <br> Address:  11 Beck St, Newburyport, MA <br> Death Date:  2 April 1894 <br><img src= https://i.pinimg.com/564x/84/ae/c5/84aec5bccbd5bba4a2e961cb29526aab.jpg  width = '200'>","<b> Sarah L. Ackley Baker <\/b> <br> Birth Date:  1803 <br> Parents:  Abihu (Elihu) Ackley  and  Anne Weir <br> Spouse:  David Baker Jr. <br> Marriage Date:  3 September 1842 <br> Address:  Lee, MA <br> Death Date:  NA <br><img src= https://i.pinimg.com/originals/63/41/5f/63415fe5bef25ed1a9d6de9845cbff0a.jpg  width = '200'>","<b> Persis Gates Goldthwait <\/b> <br> Birth Date:  18 November 1816 <br> Parents:  Nathan Goldthwait  and  Persis Goldthwait <br> Spouse:  NA <br> Marriage Date:  NA <br> Address:  Thomas St, Worcester, MA <br> Death Date:  7 June 1882 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Mercy Taft Goldthwait <\/b> <br> Birth Date:  17 April 1814 <br> Parents:  Nathan Goldthwait  and  Persis Goldthwait <br> Spouse:  NA <br> Marriage Date:  NA <br> Address:  Thomas St, Worcester, MA <br> Death Date:  22 February 1847 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>","<b> Sarah Rainsford Slater Parmenter Howe <\/b> <br> Birth Date:  11 February 1796 <br> Parents:  Peter Slater  and  Zilpah Slater <br> Spouse:  Roswell Parmenter (1st); Artemas Howe (2nd) <br> Marriage Date:  9 October 1816; 15 August 1850 <br> Address:  78 Main St, Worcester, MA <br> Death Date:  30 April 1872 <br><img src= https://i.pinimg.com/474x/45/68/c3/4568c3294167aa7b6443fdd7ae6674ec.jpg  width = '200'>"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]},{"method":"addLayersControl","args":[["OSM (default)","Toner","Toner Lite"],[],{"collapsed":false,"autoZIndex":true,"position":"topright"}]}],"limits":{"lat":[42.0773753559154,42.8114288055873],"lng":[-73.2515620598304,-70.8647698419138]}},"evals":[],"jsHooks":[]}</script>
+</div>

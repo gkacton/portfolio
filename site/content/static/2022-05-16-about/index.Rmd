@@ -1,0 +1,24 @@
+---
+title: About Me
+author: Grace Acton
+date: '2022-05-16'
+slug: about
+categories:
+  - about
+  - setup
+tags: []
+publishdate: '2022-05-16T11:32:16-04:00'
+comments: yes
+
+---
+## Hi, I'm Grace!  
+I'm a rising junior at Bates College in Lewiston, Maine.   
+      
+### Course of Study  
+**Major**: Digital Archives. This interdisciplinary major combines courses
+      from Digital and Computational Studies (DCS) and History to explore how we
+      can learn more about the lives of people in the past by using the digital 
+      tools of the present.  
+**Minors**: Mathematics and Russian Language.  
+      
+### Interests

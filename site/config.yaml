@@ -14,13 +14,10 @@ params:
   description: 
   index:
     alertbar: no
-    mdtext: |
-      Currently trying to get this blog running, still don't know what the blog will be about!\
-      **This textblock is a demonstration of the mdtext-param.**\
-      ### This is a markdown heading
-    picture: /images/batespic.jpeg
+    mdtext: 
+    picture: /images/osv_maintenance.jpeg
     subtitle: 
-    title: Grace Acton
+    title: Welcome!
   logo: 
   social:
     github: gkacton
@@ -30,7 +27,7 @@ menu:
   main:
     - identifier: about
       name: About Me
-      url: /
+      url: /static/about
       weight: 200
     - identifier: seamstresses
       name: Seamstresses Project
