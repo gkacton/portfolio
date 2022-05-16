@@ -34,7 +34,7 @@ menu:
       weight: 200
     - identifier: seamstresses
       name: Seamstresses Project
-      url: /static/imprint
+      url: /static/seamstresses-about
       weight: 200
     - identifier: blog
       name: Blog

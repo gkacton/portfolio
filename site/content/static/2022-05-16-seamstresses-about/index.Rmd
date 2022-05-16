@@ -1,0 +1,11 @@
+---
+title: About the Seamstresses Project
+author: Grace Acton
+date: '2022-05-16'
+slug: seamstresses-about
+categories:
+  - seamstresses
+tags: []
+publishdate: '2022-05-16T10:47:08-04:00'
+comments: yes
+---
