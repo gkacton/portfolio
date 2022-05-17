@@ -13,6 +13,13 @@ comments: yes
 ---
 ## Hi, I'm Grace!  
 I'm a rising junior at Bates College in Lewiston, Maine.   
+
+### Summer 2022
+I'm so excited to be the Summer 2022 Dorothy W. Sanborn Intern at the Rufus
+Porter Museum of Art and Ingenuity in Bridgton, Maine! My responsibilities 
+will include leading tours, organizing volunteers, and, most excitingly, using
+R to create interactive digital maps for an upcoming exhibit on the travels of
+Rufus Porter and other mid-19th century itinerant artists. 
       
 ### Course of Study  
 **Major**: Digital Archives. This interdisciplinary major combines courses
