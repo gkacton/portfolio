@@ -22,3 +22,10 @@ I'm a rising junior at Bates College in Lewiston, Maine.
 **Minors**: Mathematics and Russian Language.  
       
 ### Interests
+
+Data visualization in R  
+Creating interactive maps through Leaflet  
+Digital History  
+Textile and Fashion History  
+Textile Conservation  
+Museums and Public History  

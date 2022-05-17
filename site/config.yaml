@@ -14,15 +14,25 @@ params:
   description: 
   index:
     alertbar: no
-    mdtext: 
+    mdtext: |
+      I'm Grace, a textile history enthusiast and Digital Archives student.  
+      This site is a compendium of my data analysis and visualization work, historic dress research, and sewing endeavors.  
+      
+      #### Navigating this Site
+      **Blog**: This is where I'll post updates on current projects and research.   
+      **Seamstresses Project**: My first complete, independent digital history project. 
+                                View interactive maps and a presentation about 
+                                seamstresses in early 19th-century New England.
+      
+  
     picture: /images/osv_maintenance.jpeg
-    subtitle: 
-    title: Welcome!
+    subtitle: Welcome to Dressing Up Data!
+    title: Hello!
   logo: 
   social:
     github: gkacton
     instagram: <username>
-    linkedin: <username>
+    linkedin: gkacton
 menu:
   main:
     - identifier: about
