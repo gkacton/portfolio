@@ -1,4 +1,4 @@
-baseURL: https://example.com/
+baseURL: dressing-up-data.netlify.app 
 languageCode: en-us
 title: Dressing up Data
 theme: mediumish-gohugo-theme
