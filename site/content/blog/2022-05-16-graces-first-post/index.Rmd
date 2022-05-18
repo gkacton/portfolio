@@ -5,7 +5,9 @@ date: '2022-05-16'
 slug: graces-first-post
 categories:
   - setup
-tags: []
+tags: 
+  - test
+  - sewing
 publishdate: '2022-05-16T14:17:21Z'
 comments: yes
 ---
