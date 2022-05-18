@@ -1,0 +1,20 @@
+---
+title: Another Test Post
+author: Grace
+date: '2022-05-18'
+slug: another-test-post
+categories:
+  - setup
+tags:
+  - test
+  - sewing
+publishdate: '2022-05-18T09:10:10-04:00'
+comments: yes
+---
+
+# This is another trial post!
+
+```{r echo=FALSE, out.width = '40%'}
+knitr::include_graphics("rumphius.jpeg")
+```
+
