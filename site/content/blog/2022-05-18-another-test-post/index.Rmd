@@ -1,6 +1,6 @@
 ---
 title: Another Test Post
-author: Grace
+author: Grace Acton
 date: '2022-05-18'
 slug: another-test-post
 categories:
