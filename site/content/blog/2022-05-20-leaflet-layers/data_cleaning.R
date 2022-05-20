@@ -25,11 +25,8 @@ prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 # Loading Spatial Data - leaflet ------------------------------------------
 
-county_latlon <- readOGR("data/spatial_data/counties/Maine_County_Boundary_Polygons_Feature.shp")
-county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
-  # changes shapefile to be compatible with WGS84, so it will now work with leaflet
-county_latlon_sf <- county_latlon %>% 
-  st_as_sf() %>% 
+county_latlon_sf <- read_sf("data/spatial_data/counties/Maine_County_Boundary_Polygons_Feature.shp")
+county_latlon_sf <- county_latlon_sf %>% 
   rmapshaper::ms_simplify(explode = TRUE, weighting = 0.3)
   
 
