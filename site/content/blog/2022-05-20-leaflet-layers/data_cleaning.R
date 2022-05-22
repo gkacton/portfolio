@@ -21,7 +21,7 @@ library(rmapshaper)
 
 incidence <- read_csv("data/ticks/maine_tracking_network_incidence.csv")
 rates <- read_csv("data/ticks/maine_tracking_network_rate.csv")
-prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
+#prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 # Loading Spatial Data - leaflet ------------------------------------------
 
