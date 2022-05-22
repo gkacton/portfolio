@@ -25,19 +25,14 @@ prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 # Loading Spatial Data - leaflet ------------------------------------------
 
-county_latlon_sf <- read_sf("data/spatial_data/counties/Maine_County_Boundary_Polygons_Feature.shp")
-county_latlon_sf <- county_latlon_sf %>% 
+county_latlon <- read_sf("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
+county_latlon_sf <- county_latlon %>% 
+  st_transform(crs = "WGS84") %>% 
   rmapshaper::ms_simplify(explode = TRUE, weighting = 0.3)
-  
 
-# town_latlon <- readOGR("data/spatial_data/towns/towns.shp")
-# town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
-# town_latlon_sf <- town_latlon %>% 
-#   st_as_sf() %>% 
-#   rmapshaper::ms_simplify(explode = TRUE, weighting = 0.5)
-
-town_latlon_sf <- read_sf("data/spatial_data/towns/towns.shp")
-town_latlon_sf %>% 
+town_latlon <- read_sf("data/spatial_data/towns/towns.shp")
+town_latlon_sf <- town_latlon %>% 
+  st_transform(crs = "WGS84") %>% 
   rmapshaper::ms_simplify(explode = TRUE, weighting = 0.5)
 
 conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
