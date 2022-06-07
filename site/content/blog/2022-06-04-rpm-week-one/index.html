@@ -1,0 +1,67 @@
+---
+title: Week One at Rufus Porter
+author: Grace Acton
+date: '2022-06-04'
+categories:
+  - research
+tags:
+  - Rufus Porter
+  - summer 2022
+slug: rpm-week-one
+publishdate: '2022-06-04T15:46:51-04:00'
+comments: yes
+---
+
+
+
+<div class="figure"><span style="display:block;" id="fig:rpm-image"></span>
+<img src="https://umaine.edu/news/wp-content/uploads/sites/3/2019/12/Porter-exhibition-news-feature.jpg" alt="Mural from the Francis Howe House, painted by Rufus Porter and Stephen Twombly Porter in 1838. Photo by David Bohl via the University of Maine." width="100%" />
+<p class="caption">
+Figure 1: Mural from the Francis Howe House, painted by Rufus Porter and Stephen Twombly Porter in 1838. Photo by David Bohl via the University of Maine.
+</p>
+</div>
+<div id="happy-summer" class="section level2">
+<h2>Happy summer!</h2>
+<p>This week I started my summer internship at the Rufus Porter Museum of Art and Ingenuity in Bridgton, Maine. The RPM is a very small museum - I’m one of three employees at the moment - so I really get to see all the different sides of running a museum.</p>
+<div id="whatve-i-been-up-to" class="section level3">
+<h3>What’ve I been up to?</h3>
+<p>A bunch of things! My main job has been to get up to speed on all the background information and context about Rufus Porter. I’ve also been working on my research project, which is to map Rufus Porter’s travels. So, I’ve mostly been doing a lot of reading about Porter, and making a database of his artwork and known residences.</p>
+</div>
+<div id="our-rufus-porter-sources" class="section level3">
+<h3>Our Rufus Porter Sources</h3>
+<p>The first major work of scholarship on Rufus Porter was Jean Lipman’s 1968 book <em>Rufus Porter: Yankee Pioneer</em>, which she updated and republished in 1980 as <em>Rufus Porter: Rediscovered</em>. Lipman tried her best to catalog all of the Rufus Porter School murals, and to attribute them to specific artists where she could. But, she was a little bit overeager when it came to these attributions, and named Rufus Porter himself as the creator of dozens of them all over New England. It’s possible that Porter did paint all of these - he was known to be an itinerant artist from roughly 1815 to 1840-ish - but there were also many other itinerant artists at the time who painted in a similar style. Porter had at least two known protegees: his son, Stephen Twombly Porter, and his nephew, Jonathan D. Poor. Plus, Porter published instructions for landscape painting in his <em>Curious Arts</em> book, so it is likely that other painters learned his style that way. So, Lipman’s book is still considered reliable for biographical information on Porter, but her listing of his murals has been reconsidered.</p>
+<p>In 2011, Linda Carter Lefko and Jane E. Radcliffe published <em>Folk Art Murals of the Rufus Porter School</em>, which is much more careful when it comes to attributing specific works to specific artists. They go in detail on the three murals that Rufus Porter actually signed, as well as the 12 signed murals by Jonathan D. Poor. Another interesting element of the Lefko/Radcliffe book is that multiple Porter School murals were uncovered after Lipman’s study, and are examined for the first time in the 2011 book.</p>
+<p>There are also some murals that Lipman included in her index, but that she did not have an opportunity to study in person, in which Lefko and Radcliffe discovered signatures. These were all done by J.D. Poor, who was very clever about his signatures. He included his classic block-lettered “J.D. Poor” in inconspicuous places on his murals - sign posts, sides of boats, between trees. These are two of my favorites: the “Hotel J.D.P.” from the overmantle painting in the Warren Pederson House in Standish, ME, and the “J.D. Poor” paddle boat wheel from the Oliver Prescott House in Groton, MA.</p>
+<div class="figure"><span style="display:block;" id="fig:jdp-initials"></span>
+<img src="http://s3.amazonaws.com/afanews_articles/01019/FIG-10_-%282.png" alt="Two signatures from Jonathan D. Poor murals. One is &quot;J.D. Poor&quot; written in black on a yellow paddle boat wheel, and the other is &quot;Hotel J.D.P.&quot; written in black on a red signpost." width="50%" /><img src="http://s3.amazonaws.com/afanews_articles/01019/FIG-11_-13---Prescott-signature.png" alt="Two signatures from Jonathan D. Poor murals. One is &quot;J.D. Poor&quot; written in black on a yellow paddle boat wheel, and the other is &quot;Hotel J.D.P.&quot; written in black on a red signpost." width="50%" />
+<p class="caption">
+Figure 2: Images from “Rediscovering Jonathan D. Poor” by Jane E. Radcliffe on AFANews.com.
+</p>
+</div>
+<p>The last, and most recent, work of Rufus Porter scholarship is <em>Rufus Porter’s Curious World: Art and Invention in America, 1815-1860</em>, which was edited by Laura French Sprague and Justin Wolff in 2019 as a companion to the Bowdoin College Museum of Art exhibit of the same name. Unfortunately, this exhibit opened in late 2019, and, like everything else, had to close in March 2020. This exhibit and book were much more focused on Porter’s time as an itinerant portrait painter and his scientific endeavors. The chapter on portraiture was very helpful for my research project, as Porter’s travels were not limited to his time as a muralist. Although, like his murals, Porter rarely signed his portraits, he was very diligent in labeling his works with the subject’s name, what town they lived in, and what year the portrait was painted.</p>
+<p>I also just think Porter’s portrait style is adorable. We have some of them on display at the Museum right now, and I love to just hang out in the portrait room and stare at them. It’s difficult to tell in a digital image, but Porter’s portraits are very small - most are on roughly 4” x 6” cards, or smaller. His style is so delicate and charming, and it makes his work distinctive. Even though he only signed one or two known portraits, Porter’s portrait works are more easily attributable to him than his murals are. Obviously, nobody can be 100% certain without a signature, but folk art historians seem to find it easy to agree on Rufus Porter portraits.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:porter-portrait"></span>
+<img src="jacob_davis.jpg" alt="Side profile portrait of a young man with black hair wearing a blue jacket and white shirt with high collar." width="548" />
+<p class="caption">
+Figure 3: Portrait of Jacob Davis of Minot, ME, painted by Rufus Porter, ca. 1815. Image from the Museum of Fine Arts, Boston, MA.
+</p>
+</div>
+</div>
+<div id="r-tidbits" class="section level3">
+<h3>R Tidbits</h3>
+<p>To put all of this together into a map, I’ll be using my favorite R package, <code>leaflet</code>. I love <code>leaflet</code> because of how easily you can customize the appearance and functionality of your maps. During my Short Term course, I learned a lot of new features for <code>leaflet</code> which I hadn’t used before, including <code>awesomeMarkers</code>, <code>addLayersControl</code>, and <code>mapPanes</code>.</p>
+<p>The layer control functions are already proving to be very helpful because of the sheer number of data points I have. Including all of the Rufus Porter School murals and portraits from the three books I mentioned, I have <strong>178 works</strong> to include on the map. The layer controls will let people filter by artist attribution and medium (mural vs portrait), which will make the map much more functional and readable.</p>
+<p>I’ve also been playing around with <code>Shiny</code> to make an animated map. This one adds the works to the map in chronological order, and lets you filter by artist. But, I am quickly running in to the problem I’ve had with <code>Shiny</code> in the past, which is how uncooperative it is when it comes to actually hosting the app online. To the best of my knowledge, the only place to host a <code>Shiny</code> app is on <code>shinyapps.io</code>, but the free version of <code>shinyapps</code> has a super limited memory. The very preliminary version of the animated map is already too big to run, even though it runs perfectly fast when I run it locally. I’m very frustrated with the hosting issue, so I think I will back away from using <code>Shiny</code> for this project. I think <code>gganimate</code> might have some options for maps, which I will be exploring soon.</p>
+<p>I’ll post an in-progress version of the map once it is actually in a state to share, which it obviously is not after just one week of work!</p>
+</div>
+<div id="whats-happening-this-week" class="section level3">
+<h3>What’s happening this week?</h3>
+<p>It’s opening week! On Friday we have our preview party, and Saturday is opening day. Saturday is also the Bridgton Second Saturday Art Walk, and we’re on the <a href="https://docs.google.com/document/d/1zwb9mGIpevBS5OJWazwaFw7SfK2gQNUJQUkMIVGwPBI/edit?usp=sharing">map</a>! I’ve been studying up on the exhibit information and practicing my tour talk, but I think we have a very eager crew of docents for opening day, so I will mostly be support. Maybe I’ll get to hang out in the portrait room…</p>
+<div class="figure"><span style="display:block;" id="fig:pleasant-mtn"></span>
+<img src="pleasantmountain.jpg" alt="View from the top of a mountain." width="2016" />
+<p class="caption">
+Figure 4: The view from the top of Pleasant Mountain, near Rufus Porter’s childhood home, which I hiked on Sunday.
+</p>
+</div>
+</div>
+</div>
