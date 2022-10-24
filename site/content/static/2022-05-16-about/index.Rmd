@@ -12,14 +12,7 @@ comments: yes
 
 ---
 ## Hi, I'm Grace!  
-I'm a rising junior at Bates College in Lewiston, Maine.   
-
-### Summer 2022
-I'm so excited to be the Summer 2022 Dorothy W. Sanborn Intern at the Rufus
-Porter Museum of Art and Ingenuity in Bridgton, Maine! My responsibilities 
-will include leading tours, organizing volunteers, and, most excitingly, using
-R to create interactive digital maps for an upcoming exhibit on the travels of
-Rufus Porter and other mid-19th century itinerant artists. 
+I'm a junior at Bates College in Lewiston, Maine.   
       
 ### Course of Study  
 **Major**: Digital Archives. This interdisciplinary major combines courses
@@ -31,8 +24,18 @@ Rufus Porter and other mid-19th century itinerant artists.
 ### Interests
 
 Data visualization in R  
-Creating interactive maps through Leaflet  
 Digital History  
 Textile and Fashion History  
 Textile Conservation  
 Museums and Public History  
+
+### Current Courses
+
+Advanced Russian
+Technology in US History
+Upstairs, Downstairs, and Outside: The Household in British History
+Museum Internship at the Bates College Museum of Art 
+
+### Current Project at the Bates Museum of Art
+
+I'm currently working on helping the Bates Museum of Art develop a crowdsourcing platform to re-tag the art in our digital collection database. When the collection database was made, there was no consistent schema in place for how to tag artworks. As a result, the database is not easily searchable or filter-able, and there are several works that have no tagging beyond the object type. There are 8,000 works in the collection, making it impossible for the small museum staff to re-tag everything themselves.We are looking to use [Zooniverse](https://www.zooniverse.org/projects) to host a crowdsourcing project, which will let art-loving volunteers provide tags for us! I'm very excited to be working on this project, and will post updates as we move forward!
