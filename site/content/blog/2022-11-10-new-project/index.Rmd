@@ -1,7 +1,7 @@
 ---
 title: 'New Year, New Post'
 author: Grace Acton
-date: '2023-01-05'
+date: '2023-01-05' 
 slug: new-project
 categories:
   - research
