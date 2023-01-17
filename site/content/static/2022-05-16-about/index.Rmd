@@ -23,18 +23,20 @@ I'm a junior at Bates College in Lewiston, Maine.
       
 ### Interests
 
-Data visualization in R  
+Data Visualization in R  
 Digital History  
 Textile and Fashion History  
-Textile Conservation  
-Museums and Public History  
+Museum Studies and Public History  
 
 ### Current Courses
 
 Advanced Russian
-Technology in US History
-Upstairs, Downstairs, and Outside: The Household in British History
-Museum Internship at the Bates College Museum of Art 
+
+Archives, Data, and Analysis
+
+The Medieval Year
+
+Ballet II
 
 ### Current Project at the Bates Museum of Art
 
